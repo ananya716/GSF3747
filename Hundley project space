@@ -1,7 +1,5 @@
 # GSF3747
 
-# navigate to project space
+cd /N/project/HundleyLab        # navigate to project space
 
-cd /N/project/HundleyLab
-
-mkdir GSF3747
+mkdir GSF3747                   # make a directory for files
