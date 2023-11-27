@@ -1,3 +1,6 @@
+
+scp /Users/ananyamahapatra/Desktop/archive-GSF3747.run1.tar amahapat@carbonate.uits.iu.edu:/N/project/HundleyLab/GSF3747   # transfer files to Hundley project space
+
 # GSF3747
 
 cd /N/project/HundleyLab        # navigate to project space
