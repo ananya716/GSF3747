@@ -3,3 +3,13 @@
 cd /N/project/HundleyLab        # navigate to project space
 
 mkdir GSF3747                   # make a directory for files
+
+cd GSF3747                      # enter directory
+
+scp GSF3747* amahapat@carbonate.uits.iu.edu:/N/slate/amahapat/GSF3747             # copy files to your own directory
+
+cd /N/slate/amahapat/GSF3747               # navigate back to your directory
+
+gunzip GSF3747*                            # unzip files
+
+# proceed to alignment
