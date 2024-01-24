@@ -11,3 +11,4 @@ countsTable <- read.csv("/Users/ananyamahapatra/Desktop/finalRIPs.csv", header =
 experimentData <- read.csv("/Users/ananyamahapatra/Desktop/experiments_1.csv", header=TRUE, sep = ",")   # experiments.txt file is where you assign the conditions/samples etc
 rownames(experimentData) <- experimentData$sample
 dds <- DESeqDataSetFromMatrix(countData = countsTable, colData = experimentData, design = ~ assay + condition + assay:condition)
+dds$condition <- factor(dds$condition, levels=c("Ctrl","ADR1"))  
