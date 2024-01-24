@@ -1,2 +1,14 @@
 # Text file with RIP read counts is on the desktop 
 
+# Open R studio 3.6.3
+
+library("gplots")
+library("RColorBrewer")
+library("genefilter")
+library("ggplot2")
+
+countsTable <- read.csv("/Users/ananyamahapatra/Desktop/finalRIPs.csv", header = TRUE, row.names = 1)
+experimentData <- read.csv("/Users/ananyamahapatra/Desktop/experiments_1.csv", header=TRUE, sep = ",")   # experiments.txt file is where you assign the conditions/samples etc
+rownames(experimentData) <- experimentData$sample
+dds <- DESeqDataSetFromMatrix(countData = countsTable, colData = experimentData, design = ~ assay + condition + condition:replicate + condition:assay)
+
