@@ -6,9 +6,31 @@ library("gplots")
 library("RColorBrewer")
 library("genefilter")
 library("ggplot2")
+library("DESeq2)
 
 countsTable <- read.csv("/Users/ananyamahapatra/Desktop/finalRIPs.csv", header = TRUE, row.names = 1)
-experimentData <- read.csv("/Users/ananyamahapatra/Desktop/experiments_1.csv", header=TRUE, sep = ",")   # experiments.txt file is where you assign the conditions/samples etc
+experimentData <- read.csv("/Users/ananyamahapatra/Desktop/experiment.csv", header=TRUE, sep = ",")   # experiments.txt file is where you assign the conditions/samples etc
 rownames(experimentData) <- experimentData$sample
 dds <- DESeqDataSetFromMatrix(countData = countsTable, colData = experimentData, design = ~ assay + condition + assay:condition)
-dds$condition <- factor(dds$condition, levels=c("Ctrl","ADR1"))  
+
+dds$condition <- factor(dds$condition, levels=c("Ctrl","ADR1")) 
+
+dds <- DESeq(dds, test="LRT", reduced = ~ 1)
+
+res_LRT <- results(dds, test="LRT")
+
+length(which(res_LRT$padj <= 0.05)) 
+#this allows to select for genes that have padj lower than 0.05 and prints the number on R. 8626
+
+write.table(res_LRT, file="/Users/ananyamahapatra/Desktop/DESeq2_LRT_Results_RIPsAM.tsv", quote=FALSE, sep="\t", na="NA", col.names=NA)
+
+normcounts <- counts(dds, normalized=T)
+
+write.table(normcounts, file="/Users/ananyamahapatra/Desktop/normalized_countstableRIPs", quote=FALSE, sep="\t", col.names=NA)
+
+sizefactors <- sizeFactors(dds)
+
+write.table(sizefactors, file="/Users/ananyamahapatra/Desktop/SizeFactors_RIPs.txt", quote=FALSE, sep="\t", col.names=NA)
+
+# files are on desktop now
+
