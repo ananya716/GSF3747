@@ -1,1 +1,15 @@
+Go to https://docs.conda.io/projects/miniconda/en/latest/index.html
+Copy link of miniconda Miniconda3 Linux 64-bit with right mouse click - copy link
+cd /N/slate/amahapat
+wget ctrl+shift+V
+# To run it,
+bash Miniconda3-latest-Linux-x86_64.sh
+/N/slate/amahapat/miniconda3
+yes
+yes
+# Then close ThinLinc fully and reopen 
+
+conda create -n pathogenripseq -c conda-forge -c bioconda samtools bedtools
+
+conda activate pathogenripseq
 
