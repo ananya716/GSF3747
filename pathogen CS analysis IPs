@@ -1,0 +1,70 @@
+# Transferred OP-50 IP and input samples (excluded rep 4) onto server 
+
+gunzip GSF-3747*
+
+conda activate pathogenripseq
+
+ASSEMBLY='ftp://ftp.wormbase.org/pub/wormbase/releases/WS275/species/c_elegans/PRJNA13758/c_elegans.PRJNA13758.WS275.genomic.fa.gz'
+ANNOTATION='ftp://ftp.wormbase.org/pub/wormbase/releases/WS275/species/c_elegans/PRJNA13758/c_elegans.PRJNA13758.WS275.canonical_geneset.gtf.gz'
+
+################################
+## Generate STAR Genome Index ##
+################################
+
+# Make a directory to store the genome files.
+
+mkdir -p genome
+
+# Download and unpack the genome assembly.
+
+curl $ASSEMBLY | gunzip > ./genome/assembly.fasta
+
+# Download and unpack the genome annotation.
+
+curl $ANNOTATION | gunzip > ./genome/annotation.gtf
+
+# Create a directory to store the index.
+
+mkdir -p genome/index
+
+# Create the STAR genome index.
+# --genomeSAindexNbases 12 was recommended by software.
+
+module load star
+
+STAR \
+  --runThreadN 4 \
+  --runMode genomeGenerate \
+  --genomeDir genome/index \
+  --genomeFastaFiles genome/assembly.fasta \
+  --sjdbGTFfile genome/annotation.gtf \
+  --genomeSAindexNbases 12
+
+###########################
+## Align Reads to Genome ##
+###########################
+
+# Create an output directory for aligned reads.
+
+mkdir -p results/aligned
+
+# Align the reads.
+
+FASTQ=$GSF3747*
+
+for FASTQ in ${FASTQ[@]}; do
+  PREFIX=results/aligned/$(basename $FASTQ .fastq)_
+  STAR \
+    --runThreadN 8 \
+    --outFilterMultimapNmax 1 \
+    --outFilterScoreMinOverLread .66 \
+    --outFilterMismatchNmax 10 \
+    --outFilterMismatchNoverLmax .3 \
+    --runMode alignReads \
+    --genomeDir genome/index \
+    --readFilesIn $FASTQ \
+    --outFileNamePrefix $PREFIX \
+    --outSAMattributes All \
+    --outSAMtype BAM SortedByCoordinate
+done
+
