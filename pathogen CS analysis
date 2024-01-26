@@ -131,7 +131,6 @@ Proceeded to do DESeq2 on R studio
 library(tidyverse)
 > library(DESeq2)
 > countdata <- read.table("/Users/ananyamahapatra/Desktop/CS inputs counts.tsv", header=TRUE,row.names = 1)
-> countdata <- read.table("/Users/ananyamahapatra/Desktop/CS inputs counts.tsv", header=TRUE,row.names = 1)
 > countdata <- countdata[,6:ncol(countdata)]
 > colnames(countdata)
 [1] "OP50.3XFLAG.ADR.1.input.rep1" "OP50.3XFLAG.ADR.1.input.rep2"
