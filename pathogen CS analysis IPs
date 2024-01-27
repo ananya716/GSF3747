@@ -1,4 +1,4 @@
-# Transferred OP-50 IP and input samples (excluded rep 4) onto server 
+# Transferred OP-50 IP and input samples (excluded rep 4) onto server and then repeated from beginning for the PA14 samples
 
 gunzip GSF-3747*
 
