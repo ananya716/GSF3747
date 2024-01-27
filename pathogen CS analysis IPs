@@ -66,7 +66,7 @@ for FASTQ in ${FASTQ[@]}; do
     --outFileNamePrefix $PREFIX \
     --outSAMattributes All \
     --outSAMtype BAM SortedByCoordinate
-done
+done 
 
 # Indexing the BAM files.
 
