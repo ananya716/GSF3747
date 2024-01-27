@@ -107,5 +107,27 @@ scp amahapat@quartz.uits.iu.edu:/N/slate/amahapat/pathogenRIPs/results/counts/co
 
 Proceeded to do DESeq2 on R studio
 
+  library(gplots)
+  library(RColorBrewer)
+  library(genefilter)
+  library(ggplot2)
+  library(DESeq2)
+> countsTable <- read.csv("/Users/ananyamahapatra/Desktop/CS OP50 RIPs counts.csv", header = TRUE, row.names = 1)
+> experimentData <- read.csv("/Users/ananyamahapatra/Desktop/CS OP50 experiment.csv", header=TRUE, sep = ",")
+> rownames(experimentData) <- experimentData$sample
+> dds <- DESeqDataSetFromMatrix(countData = countsTable, colData = experimentData, design = ~ assay + condition + assay:condition)
+> dds$condition <- factor(dds$condition, levels=c("Ctrl","ADR1")) 
+> dds <- DESeq(dds, test="LRT", reduced = ~ 1)
+estimating size factors
+estimating dispersions
+gene-wise dispersion estimates
+mean-dispersion relationship
+final dispersion estimates
+fitting model and testing
+> res_LRT <- results(dds, test="LRT")
+> length(which(res_LRT$padj <= 0.05)) 
+[1] 3996
+> write.table(res_LRT, file="/Users/ananyamahapatra/Desktop/DESeq2_LRT_Results_RIPsOP50CS.tsv", quote=FALSE, sep="\t", na="NA", col.names=NA)
+
 
 
