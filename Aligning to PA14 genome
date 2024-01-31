@@ -34,7 +34,7 @@ mkdir -p PA14genomeresults/aligned
 FASTQ=$GSF3747*
 
 for FASTQ in ${FASTQ[@]}; do
-  PREFIX=PA14results/aligned/$(basename $FASTQ .fastq)_
+  PREFIX=PA14genomeresults/aligned/$(basename $FASTQ .fastq)_
   STAR \
     --runThreadN 8 \
     --outFilterMultimapNmax 1 \
