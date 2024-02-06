@@ -109,6 +109,8 @@ conda install bioconda::bioconductor-rsubread
 
 BAMS=$(find ./results/aligned -name "*\.bam")
 
+conda activate featurecounts
+
 featureCounts \
   -a genome/annotation.gtf \
   -o results/counts/counts.tsv \
