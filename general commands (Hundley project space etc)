@@ -16,3 +16,11 @@ cd /N/slate/amahapat/GSF3747               # navigate back to your directory
 gunzip GSF3747*                            # unzip files
 
 # proceed to alignment
+
+# Command for trasnferring file from Desktop to slate directory
+
+# On local terminal, go to Desktop (cd Desktop)
+
+Example-
+
+scp coords.txt amahapat@quartz.uits.iu.edu:/N/slate/amahapat/GSF3747/GSF3747RIPs/motif
