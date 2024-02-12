@@ -51,10 +51,10 @@ done
 
 For generating counts file- 
 
-
+BAMS=$(find ./results/aligned -name "*\.bam")
 featureCounts \
-  -a genome/annotation.gtf \
-  -o results/counts/counts.tsv \
+  -a PA14genome/annotation.gtf \
+  -o PA14genomeresults/counts/counts.tsv \
   -t gene \
   -g gene_id \
   --largestOverlap \
