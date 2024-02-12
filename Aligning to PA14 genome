@@ -55,7 +55,8 @@ BAMS=$(find ./PA14genomeresults/aligned -name "*\.bam")
 featureCounts  
 -a PA14genome/annotation.gtf  
 -o PA14genomeresults/counts/counts.tsv   
--t CDS   
+-t CDS
+-g geneid
 --largestOverlap   
 --readExtension3 150   
 --primary   -s 2   
