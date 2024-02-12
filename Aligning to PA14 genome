@@ -51,7 +51,7 @@ done
 
 For generating counts file- 
 
-BAMS=$(find ./results/aligned -name "*\.bam")
+BAMS=$(find ./PA14genomeresults/aligned -name "*\.bam")
 featureCounts \
   -a PA14genome/annotation.gtf \
   -o PA14genomeresults/counts/counts.tsv \
