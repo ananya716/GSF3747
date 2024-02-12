@@ -52,15 +52,14 @@ done
 For generating counts file- 
 
 BAMS=$(find ./PA14genomeresults/aligned -name "*\.bam")
-featureCounts \
-  -a PA14genome/annotation.gtf \
-  -o PA14genomeresults/counts/counts.tsv \
-  -t gene \
-  -g gene_id \
-  --largestOverlap \
-  --readExtension3 150 \
-  --primary \
-  -s 2 \
-  -T 8 \
-  ${BAMS}
+featureCounts  
+-a PA14genome/annotation.gtf  
+-o PA14genomeresults/counts/counts.tsv   
+-t CDS   
+--largestOverlap   
+--readExtension3 150   
+--primary   -s 2   
+-T 8   
+${BAMS}
+
 
