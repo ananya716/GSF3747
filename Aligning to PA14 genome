@@ -49,3 +49,18 @@ for FASTQ in ${FASTQ[@]}; do
     --outSAMtype BAM SortedByCoordinate
 done 
 
+For generating counts file- 
+
+
+featureCounts \
+  -a genome/annotation.gtf \
+  -o results/counts/counts.tsv \
+  -t gene \
+  -g gene_id \
+  --largestOverlap \
+  --readExtension3 150 \
+  --primary \
+  -s 2 \
+  -T 8 \
+  ${BAMS}
+
