@@ -17,7 +17,7 @@ gunzip GSF3747*                            # unzip files
 
 # proceed to alignment
 
-# Command for trasnferring file from Desktop to slate directory
+# Command for transferring file from Desktop to slate directory
 
 # On local terminal, go to Desktop (cd Desktop)
 
