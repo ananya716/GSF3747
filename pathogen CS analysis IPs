@@ -128,6 +128,8 @@ fitting model and testing
 > length(which(res_LRT$padj <= 0.05)) 
 [1] 3996
 > write.table(res_LRT, file="/Users/ananyamahapatra/Desktop/DESeq2_LRT_Results_RIPsOP50CS.tsv", quote=FALSE, sep="\t", na="NA", col.names=NA)
+normcounts <- counts(dds, normalized=T)
 
+write.table(normcounts, file="/Users/ananyamahapatra/Desktop/normalized_countstable_OP50bound.txt", quote=FALSE, sep="\t", col.names=NA)
 
 
