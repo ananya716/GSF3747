@@ -167,6 +167,3 @@ fitting model and testing
 > names(resdata)[1] <- "Gene"
 > write.csv(resdata,file="/Users/ananyamahapatra/Desktop/3XFLAGvsadr-1diffexp.csv")
 
-normcounts <- counts(dds, normalized=T)
-
-write.table(normcounts, file="/Users/ananyamahapatra/Desktop/normalized_countstable_OP50bound.txt", quote=FALSE, sep="\t", col.names=NA)
