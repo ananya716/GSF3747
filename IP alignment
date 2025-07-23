@@ -1,4 +1,3 @@
-# Transferred OP-50 IP and input samples (excluded rep 4) onto server and then repeated from beginning for the PA14 samples
 
 gunzip GSF-3747*
 
@@ -112,8 +111,8 @@ Proceeded to do DESeq2 on R studio
   library(genefilter)
   library(ggplot2)
   library(DESeq2)
-> countsTable <- read.csv("/Users/ananyamahapatra/Desktop/CS OP50 RIPs counts.csv", header = TRUE, row.names = 1)
-> experimentData <- read.csv("/Users/ananyamahapatra/Desktop/CS OP50 experiment.csv", header=TRUE, sep = ",")
+> countsTable <- read.csv("/Users/ananyamahapatra/Desktop/RIPs counts.csv", header = TRUE, row.names = 1)
+> experimentData <- read.csv("/Users/ananyamahapatra/Desktop/IP experiment.csv", header=TRUE, sep = ",")
 > rownames(experimentData) <- experimentData$sample
 > dds <- DESeqDataSetFromMatrix(countData = countsTable, colData = experimentData, design = ~ assay + condition + assay:condition)
 > dds$condition <- factor(dds$condition, levels=c("Ctrl","ADR1")) 
@@ -126,10 +125,5 @@ final dispersion estimates
 fitting model and testing
 > res_LRT <- results(dds, test="LRT")
 > length(which(res_LRT$padj <= 0.05)) 
-[1] 3996
-> write.table(res_LRT, file="/Users/ananyamahapatra/Desktop/DESeq2_LRT_Results_RIPsOP50CS.tsv", quote=FALSE, sep="\t", na="NA", col.names=NA)
-normcounts <- counts(dds, normalized=T)
-
-write.table(normcounts, file="/Users/ananyamahapatra/Desktop/normalized_countstable_OP50bound.txt", quote=FALSE, sep="\t", col.names=NA)
 
 
