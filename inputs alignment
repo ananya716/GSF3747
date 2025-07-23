@@ -1,25 +1,3 @@
-Go to https://docs.conda.io/projects/miniconda/en/latest/index.html
-Copy link of miniconda Miniconda3 Linux 64-bit with right mouse click - copy link
-cd /N/slate/amahapat
-wget ctrl+shift+V
-# To run it,
-bash Miniconda3-latest-Linux-x86_64.sh
-/N/slate/amahapat/miniconda3
-yes
-yes
-# Then close ThinLinc fully and reopen 
-
-conda create -n pathogenripseq -c conda-forge -c bioconda samtools bedtools
-
-conda activate pathogenripseq
-
-# On Hundley Lab Project Space- 
-
-scp GSF3747-OP50-3XFLAG-ADR-1-input* /N/slate/amahapat/pathogen 
-scp GSF3747-OP50-adr-1-input* /N/slate/amahapat/pathogen
-scp GSF3747-PA14-3XFLAG-ADR-1-input* /N/slate/amahapat/pathogen
-scp GSF3747-PA14-adr-1-input* /N/slate/amahapat/pathogen
-
 gunzip GSF3747*
 
 ASSEMBLY='ftp://ftp.wormbase.org/pub/wormbase/releases/WS275/species/c_elegans/PRJNA13758/c_elegans.PRJNA13758.WS275.genomic.fa.gz'
@@ -129,42 +107,5 @@ On local terminal, type cd Desktop
 scp amahapat@quartz.uits.iu.edu:/N/slate/amahapat/pathogen/results/counts/counts.tsv .
 
 Proceeded to do DESeq2 on R studio
-
-library(tidyverse)
-> library(DESeq2)
-> countdata <- read.table("/Users/ananyamahapatra/Desktop/CS inputs counts.tsv", header=TRUE,row.names = 1)
-> countdata <- countdata[,6:ncol(countdata)]
-> colnames(countdata)
-[1] "OP50.3XFLAG.ADR.1.input.rep1" "OP50.3XFLAG.ADR.1.input.rep2"
-[3] "OP50.3XFLAG.ADR.1.input.rep4" "OP50.adr.1.input.rep1"       
-[5] "OP50.adr.1.input.rep2"        "OP50.adr.1.input.rep4"       
-> countdata <- as.matrix(countdata)
-> countdata <- countdata[,c("OP50.adr.1.input.rep1","OP50.adr.1.input.rep2","OP50.adr.1.input.rep4","OP50.3XFLAG.ADR.1.input.rep1","OP50.3XFLAG.ADR.1.input.rep2","OP50.3XFLAG.ADR.1.input.rep4")]
-> (condition <- factor(c(rep("b",3),rep("a",3))))
-[1] b b b a a a
-Levels: a b
-> (coldata <- data.frame(row.names=colnames(countdata),condition))
-                             condition
-OP50.adr.1.input.rep1                b
-OP50.adr.1.input.rep2                b
-OP50.adr.1.input.rep4                b
-OP50.3XFLAG.ADR.1.input.rep1         a
-OP50.3XFLAG.ADR.1.input.rep2         a
-OP50.3XFLAG.ADR.1.input.rep4         a
-> dds <- DESeqDataSetFromMatrix(countData = countdata,colData = coldata, design=~condition)
-> keep = rowSums(counts(dds)) >= 1
-> dds <- dds[keep,]
-> dds <- DESeq(dds)
-estimating size factors
-estimating dispersions
-gene-wise dispersion estimates
-mean-dispersion relationship
-final dispersion estimates
-fitting model and testing
-> res <- results(dds)
-> resdata <- merge(as.data.frame(res),as.data.frame(counts(dds,normalized=TRUE)),by="row.names",sort=FALSE)
-> 
-> names(resdata)[1] <- "Gene"
-> write.csv(resdata,file="/Users/ananyamahapatra/Desktop/3XFLAGvsadr-1diffexp.csv")
 
 
