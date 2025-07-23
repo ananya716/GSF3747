@@ -1,10 +1,108 @@
+conda activate rnaseq
 
+# unzip .gz files
 
+gzip -d GSF3747*.gz
 
+# Unload system perl for compatability with entrez-direct.
 
+module unload perl
 
+# Variables.
 
+ASSEMBLY='ftp://ftp.wormbase.org/pub/wormbase/releases/WS275/species/c_elegans/PRJNA13758/c_elegans.PRJNA13758.WS275.genomic.fa.gz'
+ANNOTATION='ftp://ftp.wormbase.org/pub/wormbase/releases/WS275/species/c_elegans/PRJNA13758/c_elegans.PRJNA13758.WS275.canonical_geneset.gtf.gz'
 
+################################
+## Generate STAR Genome Index ##
+################################
+
+# Make a directory to store the genome files.
+
+mkdir -p genome
+
+# Download and unpack the genome assembly.
+
+curl $ASSEMBLY | gunzip > ./genome/assembly.fasta
+
+# Download and unpack the genome annotation.
+
+curl $ANNOTATION | gunzip > ./genome/annotation.gtf
+
+# Create a directory to store the index.
+
+mkdir -p genome/index
+
+# Create the STAR genome index.
+# --genomeSAindexNbases 12 was recommended by software.
+
+STAR \
+  --runThreadN 4 \
+  --runMode genomeGenerate \
+  --genomeDir genome/index \
+  --genomeFastaFiles genome/assembly.fasta \
+  --sjdbGTFfile genome/annotation.gtf \
+  --genomeSAindexNbases 12
+
+###########################
+## Align Reads to Genome ##
+###########################
+
+# Create an output directory for aligned reads.
+
+mkdir -p results/aligned
+
+# Align the reads.
+
+FASTQ=$GSF3747*
+
+for FASTQ in ${FASTQ[@]}; do
+  PREFIX=results/aligned/$(basename $FASTQ .fastq)_
+  STAR \
+    --runThreadN 8 \
+    --outFilterMultimapNmax 1 \
+    --outFilterScoreMinOverLread .66 \
+    --outFilterMismatchNmax 10 \
+    --outFilterMismatchNoverLmax .3 \
+    --runMode alignReads \
+    --genomeDir genome/index \
+    --readFilesIn $FASTQ \
+    --outFileNamePrefix $PREFIX \
+    --outSAMattributes All \
+    --outSAMtype BAM SortedByCoordinate
+done
+# Indexing the BAM files.
+
+BAMS=($(find ./results/aligned -name "*\.bam"))
+
+for BAM in ${BAMS[@]}; do
+  samtools index $BAM
+  done
+  
+## Count Features ##
+####################
+
+# Create an output directory for read counts.
+
+mkdir -p results/counts
+
+# Count reads.
+
+BAMS=$(find ./results/aligned -name "*\.bam")
+
+featureCounts \
+  -a genome/annotation.gtf \
+  -o results/counts/counts.tsv \
+  -t gene \
+  -g gene_id \
+  --largestOverlap \
+  --readExtension3 150 \
+  --primary \
+  -s 2 \
+  -T 8 \
+  ${BAMS}
+  
+done
 
 # Open R studio on ThinLinc
 # Using Console, load tidyverse
@@ -12,81 +110,17 @@
 library(“tidyverse”)
 
 library(DESeq2)
-
-                       # Error shown when tried to load DESeq2 library
-                          Loading required package: S4Vectors
-                          Loading required package: stats4
-                          Error: package ‘BiocGenerics’ required by ‘S4Vectors’ could not be found
-                          
-Restarted R session to update (error overcome)
-
-install.packages("BiocManager")
-if (!require("BiocManager", quietly = TRUE))
- install.packages("BiocManager")
- BiocManager::install("BiocGenerics")
-library(DESeq2)
-                       # Error: package ‘GenomicRanges’ could not be loaded
-BiocManager::install("zlibbioc")
-library(GenomicRanges)
-
-if (!require("BiocManager", quietly = TRUE))
-install.packages("BiocManager")
-BiocManager::install("BiocParallel")
-library(DESeq2)
-
-countdata <-read.table("/geode2/home/u010/amahapat/Carbonate/GSF3279/results/counts/counts.tsv", header = TRUE, row.names = 1)
+                     
+countdata <-read.table("/geode2/home/u010/amahapat/Carbonate/GSF3747/results/counts/counts.tsv", header = TRUE, row.names = 1)
 
 countdata <- countdata[,6:ncol(countdata)]
-
-colnames(countdata)
-[1] "..results.aligned.GSF3279.CS_WT.L1.neural.cells.rep1_S13_R1_001_Aligned.sortedByCoord.out.bam"   
-[2] "..results.aligned.GSF3279.CS_WT.L1.neural.cells.rep3_S15_R1_001_Aligned.sortedByCoord.out.bam"   
-[3] "..results.aligned.GSF3279.CS_WT.L1.neural.cells.rep2_S14_R1_001_Aligned.sortedByCoord.out.bam"   
-[4] "..results.aligned.GSF3279.CS_adr.1.L1.neural.cells.rep1_S16_R1_001_Aligned.sortedByCoord.out.bam"
-[5] "..results.aligned.GSF3279.CS_adr.1.L1.neural.cells.rep3_S18_R1_001_Aligned.sortedByCoord.out.bam"
-[6] "..results.aligned.GSF3279.CS_adr.1.L1.neural.cells.rep2_S17_R1_001_Aligned.sortedByCoord.out.bam"
-[7] "..results.aligned.results_Aligned.sortedByCoord.out.bam"                                         
-
-colnames(countdata) <- gsub("..results.aligned.GSF3279.CS.","",colnames(countdata))
-
-colnames(countdata) <- gsub("_R1_001_Aligned.sortedByCoord.out.bam","",colnames(countdata))
-
-colnames(countdata) <- gsub("WT.L1.neural.cells.rep1_S13","WT.L1.neural.cells.rep1",colnames(countdata))
-
-colnames(countdata) <- gsub("WT.L1.neural.cells.rep1_S13","WT.L1.neural.cells.rep1",colnames(countdata))
-
-colnames(countdata) <- gsub("WT.L1.neural.cells.rep2_S14","WT.L1.neural.cells.rep2",colnames(countdata))
-
-colnames(countdata) <- gsub("WT.L1.neural.cells.rep3_S15","WT.L1.neural.cells.rep3",colnames(countdata))
-
-colnames(countdata) <- gsub("adr.1.L1.neural.cells.rep1_S16","Wadr.1.L1.neural.cells.rep1",colnames(countdata))
-
-colnames(countdata) <- gsub("adr.1.L1.neural.cells.rep2_S17","Wadr.1.L1.neural.cells.rep2",colnames(countdata))
-
-colnames(countdata) <- gsub("adr.1.L1.neural.cells.rep3_S18","Wadr.1.L1.neural.cells.rep3",colnames(countdata))
-
-colnames(countdata)
-
-[1] "WT.L1.neural.cells.rep1"                                
-[2] "WT.L1.neural.cells.rep3"                                
-[3] "WT.L1.neural.cells.rep2"                                
-[4] "Wadr.1.L1.neural.cells.rep1"                            
-[5] "Wadr.1.L1.neural.cells.rep3"                            
-[6] "Wadr.1.L1.neural.cells.rep2"                            
-                                                                        
+                 
 countdata <- as.matrix(countdata)
 
-countdata <- countdata[,c("Wadr.1.L1.neural.cells.rep1","Wadr.1.L1.neural.cells.rep2","Wadr.1.L1.neural.cells.rep3","WT.L1.neural.cells.rep1","WT.L1.neural.cells.rep2","WT.L1.neural.cells.rep3")] (condition <- factor(c(rep("b",3),rep("a",3))))
+countdata <- countdata[,c("adr-2 adr-1 dsRBD1.neural.cells.rep1","adr-2 adr-1 dsRBD1.neural.cells.rep2","adr-2 adr-1 dsRBD1.neural.cells.rep3","adr-2.neural.cells.rep1","adr-2.neural.cells.rep2","adr-2.neural.cells.rep3")] (condition <- factor(c(rep("b",3),rep("a",3))))
                                                                         [1] b b b a a a
                                                                         Levels: a b
-(coldata <- data.frame(row.names=colnames(countdata),condition))
-                                                                        condition
-                                                                        Wadr.1.L1.neural.cells.rep1         b
-                                                                        Wadr.1.L1.neural.cells.rep2         b
-                                                                        Wadr.1.L1.neural.cells.rep3         b
-                                                                        WT.L1.neural.cells.rep1             a
-                                                                        WT.L1.neural.cells.rep2             a
-                                                                        WT.L1.neural.cells.rep3             a
+
                                                                         
 dds <- DESeqDataSetFromMatrix(countData = countdata,colData = coldata, design=~condition)
 
@@ -102,12 +136,5 @@ resdata <- merge(as.data.frame(res),as.data.frame(counts(dds,normalized=TRUE)),b
 
 names(resdata)[1] <- "Gene"
 
-write.csv(resdata,file="/geode2/home/u010/amahapat/Carbonate/GSF3279/N2neuralcellsvsadr1neuralcellsdiffexp.csv")
+write.csv(resdata,file="/geode2/home/u010/amahapat/Carbonate/GSF3279/adr2vsadr1ADR1dsRBD1 neuralcellsdiffexp.csv")
 
-
-# move file to desktop
-# in terminal (outside thinlinc)
-
-scp amahapat@carbonate.uits.iu.edu://N/u/amahapat/Carbonate/GSF3279/N2neuralcellsvsadr1neuralcellsdiffexp.csv ~/Desktop
-
-# open file in Excel and analyze
