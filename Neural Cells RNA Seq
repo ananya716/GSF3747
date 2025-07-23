@@ -1,0 +1,113 @@
+
+
+
+
+
+
+
+
+# Open R studio on ThinLinc
+# Using Console, load tidyverse
+
+library(“tidyverse”)
+
+library(DESeq2)
+
+                       # Error shown when tried to load DESeq2 library
+                          Loading required package: S4Vectors
+                          Loading required package: stats4
+                          Error: package ‘BiocGenerics’ required by ‘S4Vectors’ could not be found
+                          
+Restarted R session to update (error overcome)
+
+install.packages("BiocManager")
+if (!require("BiocManager", quietly = TRUE))
+ install.packages("BiocManager")
+ BiocManager::install("BiocGenerics")
+library(DESeq2)
+                       # Error: package ‘GenomicRanges’ could not be loaded
+BiocManager::install("zlibbioc")
+library(GenomicRanges)
+
+if (!require("BiocManager", quietly = TRUE))
+install.packages("BiocManager")
+BiocManager::install("BiocParallel")
+library(DESeq2)
+
+countdata <-read.table("/geode2/home/u010/amahapat/Carbonate/GSF3279/results/counts/counts.tsv", header = TRUE, row.names = 1)
+
+countdata <- countdata[,6:ncol(countdata)]
+
+colnames(countdata)
+[1] "..results.aligned.GSF3279.CS_WT.L1.neural.cells.rep1_S13_R1_001_Aligned.sortedByCoord.out.bam"   
+[2] "..results.aligned.GSF3279.CS_WT.L1.neural.cells.rep3_S15_R1_001_Aligned.sortedByCoord.out.bam"   
+[3] "..results.aligned.GSF3279.CS_WT.L1.neural.cells.rep2_S14_R1_001_Aligned.sortedByCoord.out.bam"   
+[4] "..results.aligned.GSF3279.CS_adr.1.L1.neural.cells.rep1_S16_R1_001_Aligned.sortedByCoord.out.bam"
+[5] "..results.aligned.GSF3279.CS_adr.1.L1.neural.cells.rep3_S18_R1_001_Aligned.sortedByCoord.out.bam"
+[6] "..results.aligned.GSF3279.CS_adr.1.L1.neural.cells.rep2_S17_R1_001_Aligned.sortedByCoord.out.bam"
+[7] "..results.aligned.results_Aligned.sortedByCoord.out.bam"                                         
+
+colnames(countdata) <- gsub("..results.aligned.GSF3279.CS.","",colnames(countdata))
+
+colnames(countdata) <- gsub("_R1_001_Aligned.sortedByCoord.out.bam","",colnames(countdata))
+
+colnames(countdata) <- gsub("WT.L1.neural.cells.rep1_S13","WT.L1.neural.cells.rep1",colnames(countdata))
+
+colnames(countdata) <- gsub("WT.L1.neural.cells.rep1_S13","WT.L1.neural.cells.rep1",colnames(countdata))
+
+colnames(countdata) <- gsub("WT.L1.neural.cells.rep2_S14","WT.L1.neural.cells.rep2",colnames(countdata))
+
+colnames(countdata) <- gsub("WT.L1.neural.cells.rep3_S15","WT.L1.neural.cells.rep3",colnames(countdata))
+
+colnames(countdata) <- gsub("adr.1.L1.neural.cells.rep1_S16","Wadr.1.L1.neural.cells.rep1",colnames(countdata))
+
+colnames(countdata) <- gsub("adr.1.L1.neural.cells.rep2_S17","Wadr.1.L1.neural.cells.rep2",colnames(countdata))
+
+colnames(countdata) <- gsub("adr.1.L1.neural.cells.rep3_S18","Wadr.1.L1.neural.cells.rep3",colnames(countdata))
+
+colnames(countdata)
+
+[1] "WT.L1.neural.cells.rep1"                                
+[2] "WT.L1.neural.cells.rep3"                                
+[3] "WT.L1.neural.cells.rep2"                                
+[4] "Wadr.1.L1.neural.cells.rep1"                            
+[5] "Wadr.1.L1.neural.cells.rep3"                            
+[6] "Wadr.1.L1.neural.cells.rep2"                            
+                                                                        
+countdata <- as.matrix(countdata)
+
+countdata <- countdata[,c("Wadr.1.L1.neural.cells.rep1","Wadr.1.L1.neural.cells.rep2","Wadr.1.L1.neural.cells.rep3","WT.L1.neural.cells.rep1","WT.L1.neural.cells.rep2","WT.L1.neural.cells.rep3")] (condition <- factor(c(rep("b",3),rep("a",3))))
+                                                                        [1] b b b a a a
+                                                                        Levels: a b
+(coldata <- data.frame(row.names=colnames(countdata),condition))
+                                                                        condition
+                                                                        Wadr.1.L1.neural.cells.rep1         b
+                                                                        Wadr.1.L1.neural.cells.rep2         b
+                                                                        Wadr.1.L1.neural.cells.rep3         b
+                                                                        WT.L1.neural.cells.rep1             a
+                                                                        WT.L1.neural.cells.rep2             a
+                                                                        WT.L1.neural.cells.rep3             a
+                                                                        
+dds <- DESeqDataSetFromMatrix(countData = countdata,colData = coldata, design=~condition)
+
+keep = rowSums(counts(dds)) >= 1
+
+dds <- dds[keep,]
+
+dds <- DESeq(dds)
+
+res <- results(dds)
+
+resdata <- merge(as.data.frame(res),as.data.frame(counts(dds,normalized=TRUE)),by="row.names",sort=FALSE)
+
+names(resdata)[1] <- "Gene"
+
+write.csv(resdata,file="/geode2/home/u010/amahapat/Carbonate/GSF3279/N2neuralcellsvsadr1neuralcellsdiffexp.csv")
+
+
+# move file to desktop
+# in terminal (outside thinlinc)
+
+scp amahapat@carbonate.uits.iu.edu://N/u/amahapat/Carbonate/GSF3279/N2neuralcellsvsadr1neuralcellsdiffexp.csv ~/Desktop
+
+# open file in Excel and analyze
